@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { initialState } from "./InitialState";
-import { roundNumber, getDistance, handleCallback, handleWheelStop } from "./utils";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { initialState } from './InitialState';
+import { roundNumber, getDistance, handleCallback, handleWheelStop } from './utils';
 import {
   handleZoomControls,
   handleDoubleClick,
@@ -9,12 +9,12 @@ import {
   handlePaddingAnimation,
   handleWheelZoom,
   handleCalculateBounds,
-} from "./zoom";
-import { handleDisableAnimation } from "./animations";
-import { handleZoomPinch } from "./pinch";
-import { handlePanning } from "./pan";
-import { handleFireVelocity, animateVelocity, calculateVelocityStart } from "./velocity";
-import makePassiveEventOption from "./makePassiveEventOption";
+} from './zoom';
+import { handleDisableAnimation } from './animations';
+import { handleZoomPinch } from './pinch';
+import { handlePanning } from './pan';
+import { handleFireVelocity, animateVelocity, calculateVelocityStart } from './velocity';
+import makePassiveEventOption from './makePassiveEventOption';
 
 const Context = React.createContext({});
 
@@ -60,14 +60,17 @@ class StateProvider extends Component {
     const passiveOption = makePassiveEventOption(false);
 
     // Panning on window to allow panning when mouse is out of wrapper
-    window.addEventListener("mousedown", this.handleStartPanning, passiveOption);
-    window.addEventListener("mousemove", this.handlePanning, passiveOption);
-    window.addEventListener("mouseup", this.handleStopPanning, passiveOption);
-    return () => {
-      window.removeEventListener("mousedown", this.handleStartPanning, passiveOption);
-      window.removeEventListener("mousemove", this.handlePanning, passiveOption);
-      window.removeEventListener("mouseup", this.handleStopPanning, passiveOption);
-    };
+    window.addEventListener('mousedown', this.handleStartPanning, passiveOption);
+    window.addEventListener('mousemove', this.handlePanning, passiveOption);
+    window.addEventListener('mouseup', this.handleStopPanning, passiveOption);
+  }
+
+  componentWillUnmount() {
+    const passiveOption = makePassiveEventOption(false);
+
+    window.removeEventListener('mousedown', this.handleStartPanning, passiveOption);
+    window.removeEventListener('mousemove', this.handlePanning, passiveOption);
+    window.removeEventListener('mouseup', this.handleStopPanning, passiveOption);
   }
 
   componentDidUpdate(oldProps, oldState) {
@@ -81,11 +84,11 @@ class StateProvider extends Component {
 
       // Zooming events on wrapper
       const passiveOption = makePassiveEventOption(false);
-      wrapperComponent.addEventListener("wheel", this.handleWheel, passiveOption);
-      wrapperComponent.addEventListener("dblclick", this.handleDbClick, passiveOption);
-      wrapperComponent.addEventListener("touchstart", this.handleTouchStart, passiveOption);
-      wrapperComponent.addEventListener("touchmove", this.handleTouch, passiveOption);
-      wrapperComponent.addEventListener("touchend", this.handleTouchStop, passiveOption);
+      wrapperComponent.addEventListener('wheel', this.handleWheel, passiveOption);
+      wrapperComponent.addEventListener('dblclick', this.handleDbClick, passiveOption);
+      wrapperComponent.addEventListener('touchstart', this.handleTouchStart, passiveOption);
+      wrapperComponent.addEventListener('touchmove', this.handleTouch, passiveOption);
+      wrapperComponent.addEventListener('touchend', this.handleTouchStop, passiveOption);
     }
 
     // set bound for animations
@@ -93,7 +96,7 @@ class StateProvider extends Component {
       this.maxBounds = handleCalculateBounds.bind(
         this,
         this.stateProvider.scale,
-        this.stateProvider.limitToWrapperBounds
+        this.stateProvider.limitToWrapperBounds,
       )();
     }
 
@@ -110,13 +113,7 @@ class StateProvider extends Component {
   //////////
 
   handleWheel = event => {
-    const {
-      enableWheel,
-      enableTouchPadPinch,
-      isDown,
-      zoomingEnabled,
-      disabled,
-    } = this.stateProvider;
+    const { enableWheel, enableTouchPadPinch, isDown, zoomingEnabled, disabled } = this.stateProvider;
 
     const { onWheelStart, onWheel, onWheelStop, onZoomChange } = this.props;
     const { wrapperComponent, contentComponent } = this.state;
@@ -171,9 +168,7 @@ class StateProvider extends Component {
       !this.isDown ||
       !panningEnabled ||
       disabled ||
-      (event.touches &&
-        (event.touches.length !== 1 ||
-          Math.abs(this.startCoords.x - event.touches[0].clientX) < 1)) ||
+      (event.touches && (event.touches.length !== 1 || Math.abs(this.startCoords.x - event.touches[0].clientX) < 1)) ||
       !wrapperComponent ||
       !contentComponent
     );
@@ -188,22 +183,10 @@ class StateProvider extends Component {
   };
 
   handleStartPanning = event => {
-    const {
-      panningEnabled,
-      disabled,
-      wrapperComponent,
-      minScale,
-      scale,
-      limitToWrapperBounds,
-    } = this.stateProvider;
+    const { panningEnabled, disabled, wrapperComponent, minScale, scale, limitToWrapperBounds } = this.stateProvider;
     const { target, touches } = event;
 
-    if (
-      !panningEnabled ||
-      disabled ||
-      (wrapperComponent && !wrapperComponent.contains(target)) ||
-      scale < minScale
-    )
+    if (!panningEnabled || disabled || (wrapperComponent && !wrapperComponent.contains(target)) || scale < minScale)
       return;
 
     handleDisableAnimation.bind(this)();
@@ -264,7 +247,7 @@ class StateProvider extends Component {
   };
 
   handlePinchStop = event => {
-    if (typeof this.pinchStartScale === "number") {
+    if (typeof this.pinchStartScale === 'number') {
       this.pinchStartDistance = null;
       this.lastDistance = null;
       this.pinchStartScale = null;
@@ -310,7 +293,7 @@ class StateProvider extends Component {
     const { zoomingEnabled, disabled, zoomInStep } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
 
-    if (!event) throw Error("Zoom in function requires event prop");
+    if (!event) throw Error('Zoom in function requires event prop');
     if (!zoomingEnabled || disabled || !wrapperComponent || !contentComponent) return;
     handleZoomControls.bind(this, 1, zoomInStep)();
   };
@@ -319,7 +302,7 @@ class StateProvider extends Component {
     const { zoomingEnabled, disabled, zoomOutStep } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
 
-    if (!event) throw Error("Zoom out function requires event prop");
+    if (!event) throw Error('Zoom out function requires event prop');
     if (!zoomingEnabled || disabled || !wrapperComponent || !contentComponent) return;
     handleZoomControls.bind(this, -1, zoomOutStep)();
   };
@@ -328,9 +311,8 @@ class StateProvider extends Component {
     const { zoomingEnabled, disabled, dbClickStep, dbClickEnabled } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
 
-    if (!event) throw Error("Double click function requires event prop");
-    if (!zoomingEnabled || disabled || !dbClickEnabled || !wrapperComponent || !contentComponent)
-      return;
+    if (!event) throw Error('Double click function requires event prop');
+    if (!zoomingEnabled || disabled || !dbClickEnabled || !wrapperComponent || !contentComponent) return;
     handleDoubleClick.bind(this, event, 1, dbClickStep)();
   };
 
@@ -346,8 +328,7 @@ class StateProvider extends Component {
   setPositionX = positionX => {
     const { zoomingEnabled, disabled, transformEnabled } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
-    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent)
-      return;
+    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent) return;
     this.stateProvider.positionX = roundNumber(positionX, 3);
     // update component transformation
     this.setContentComponentTransformation();
@@ -356,8 +337,7 @@ class StateProvider extends Component {
   setPositionY = positionY => {
     const { zoomingEnabled, disabled, transformEnabled } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
-    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent)
-      return;
+    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent) return;
     this.stateProvider.positionY = roundNumber(positionY, 3);
     // update component transformation
     this.setContentComponentTransformation();
@@ -366,8 +346,7 @@ class StateProvider extends Component {
   setTransform = (positionX, positionY, scale) => {
     const { zoomingEnabled, disabled, transformEnabled } = this.stateProvider;
     const { wrapperComponent, contentComponent } = this.state;
-    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent)
-      return;
+    if (!zoomingEnabled || disabled || !transformEnabled || !wrapperComponent || !contentComponent) return;
     !isNaN(scale) && this.setScale(scale);
     !isNaN(positionX) && this.setPositionX(positionX);
     !isNaN(positionY) && this.setPositionY(positionY);
@@ -401,7 +380,7 @@ class StateProvider extends Component {
 
   setContentComponentTransformation = (scale, posX, posY) => {
     const { contentComponent } = this.state;
-    if (!contentComponent) return console.error("There is no content component");
+    if (!contentComponent) return console.error('There is no content component');
     const transform = `translate(${posX || this.stateProvider.positionX}px, ${posY ||
       this.stateProvider.positionY}px) scale(${scale || this.stateProvider.scale})`;
     contentComponent.style.transform = transform;
@@ -476,8 +455,7 @@ class StateProvider extends Component {
       },
     };
     const { children } = this.props;
-    const content =
-      typeof children === "function" ? children({ ...value.state, ...value.dispatch }) : children;
+    const content = typeof children === 'function' ? children({ ...value.state, ...value.dispatch }) : children;
 
     return <Context.Provider value={value}>{content}</Context.Provider>;
   }
