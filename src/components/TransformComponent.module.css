@@ -4,6 +4,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
